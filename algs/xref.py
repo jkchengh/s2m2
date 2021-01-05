@@ -223,7 +223,7 @@ def get_gb_xref(models, Thetas, Goals, limits, O, MO, N_min, N, min_dur = 0):
                         nodes = nodes + [x_new]
                 ma_nodes = ma_nodes + [nodes]
             problem.dispose()
-            print_solution(ma_nodes, end-start)
+            # print_solution(ma_nodes, end-start)
             return ma_nodes
         else:
             # print('No solution')

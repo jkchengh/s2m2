@@ -11,9 +11,6 @@ from viz.util import *
 def test(env, problem_path, config_path):
     name, limits, Obstacles, agents, Thetas, Goals = read_problem(problem_path)
     min_segs, max_segs, obs_steps = read_configuration(config_path)
-
-
-
     start = default_timer()
     refs = decentralized_algo(agents, Thetas, Goals, limits, Obstacles, min_segs, max_segs, obs_steps, 0)
     end = default_timer()
@@ -25,4 +22,4 @@ def test(env, problem_path, config_path):
 
     return refs
 
-test("zigzag", "problems/zigzag/problem.yaml", "problems/zigzag/config.yaml")
+test("zigzag", "problems/zigzag/problem1.yaml", "problems/zigzag/config.yaml")
