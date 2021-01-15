@@ -38,9 +38,41 @@ def compute_graph(limits, obstacles, models):
                             paths["(%s,%s)->(%s,%s)"%(i, j, p, q)] = path[0]
     return paths
 
+def plot_path(limits, Obstacles, models, ma_chosen_nodes, paths):
+    fig, axes = plot_env(limits, Obstacles)
+    # plot trajs
+    Thetas = [[cell[0]+0.5, cell[1]+0.5] for cell in Theta_cells]
+    models = models * len(Theta_cells)
+    refs = []
+    for k in range(len(ma_chosen_nodes)):
+        ref = []
+        t = 0
+        for i in range(len(ma_chosen_nodes[k])-1):
+            seg_path = paths["(%s,%s)->(%s,%s)"%(ma_chosen_nodes[k][i][0],
+                                                 ma_chosen_nodes[k][i][1],
+                                                 ma_chosen_nodes[k][i+1][0],
+                                                 ma_chosen_nodes[k][i+1][1])]
+            for j in range(len(seg_path)): seg_path[j][0] = seg_path[j][0] + t
+            t = seg_path[-1][0]
+            ref = ref + seg_path
+        refs.append(ref)
+    ma_segs = ref2traj(refs)
+    paths = extract_paths(models, Thetas, ma_segs)
+    agent_num = len(paths)
+    for idx in range(agent_num):
+        ref_x, ref_y, _, tru_x, tru_y, _, _ = paths[idx]
+        ref_x, ref_y, _, tru_x, tru_y, _, _ = paths[idx]
+        axes.plot(ref_x, ref_y, color='k', linewidth = 1, linestyle = 'dashed')
+        axes.plot(tru_x, tru_y, color='purple', linewidth = 1, linestyle='dashed',)
+    # plot grid
+    for i in range(min_x, max_x+1, 1): plt.plot([i, i], [min_y, max_y], color = 'gray', linewidth = 0.3, linestyle = 'dashed')
+    for p in range(min_y, max_y+1, 1): plt.plot([min_x, max_x], [p, p], color = 'gray', linewidth = 0.3, linestyle = 'dashed')
 
+    fig.show()
+    file = os.path.abspath("conges.pdf")
+    fig.savefig(file, bbox_inches='tight', pad_inches = 0)
 
-def plot_graph(Theta_cells, Goal_cells, models, paths):
+def plot_graph(Theta_cells, Goal_cells, limits, Obstacles, models, paths):
     plt.close('all')
     fig, axes = plot_env(limits, Obstacles)
     # plot trajs
@@ -63,8 +95,7 @@ def plot_graph(Theta_cells, Goal_cells, models, paths):
     fig.show()
     file = os.path.abspath("conges.pdf")
     fig.savefig(file, bbox_inches='tight', pad_inches = 0)
-
-
+    
 def optimize(Theta_cells, Goal_cells, limits, paths):
     min_x, max_x = limits[0]
     min_y, max_y = limits[1]
@@ -124,10 +155,12 @@ def optimize(Theta_cells, Goal_cells, limits, paths):
     # solve
     model.setParam(GRB.Param.OutputFlag, 0)
     model.optimize()
-    print_solution(vars, Theta_cells, Goal_cells, limits, paths)
+    ma_chosen_nodes = get_solution(vars, Theta_cells, Goal_cells, limits, paths)
     model.dispose
+    return ma_chosen_nodes
 
-def print_solution(vars, starts, goals, limits, paths):
+def get_solution(vars, starts, goals, limits, paths):
+    ma_chosen_nodes = []
     print("Print Solutions")
     for name in vars.keys(): print(name, " = ", vars[name].x)
     print("Minimized Threshold: %s"%(vars["threshold"].x))
@@ -148,6 +181,8 @@ def print_solution(vars, starts, goals, limits, paths):
                         chosen_nodes.append((i,j))
                         pos = (i,j)
         print("Ｐath:", chosen_nodes)
+        ma_chosen_nodes.append(chosen_nodes)
+    return ma_chosen_nodes
 
 def incoming_edges(cell, limits, paths):
     min_x, max_x = limits[0]
@@ -209,11 +244,13 @@ k = [1, 1, 1]
 models = [Car(size, velocity, k)]
 # plan path
 paths = compute_graph(limits, Obstacles, models)
-# plot
-Theta_cells = [(3, 3), (2, 2)]
-Goal_cells = [(3, 5), (4, 3)]
-plot_graph(Theta_cells, Goal_cells, models, paths)
+# # plot
+# Theta_cells = [(3, 3), (2, 2)]
+# Goal_cells = [(3, 5), (4, 3)]
+# plot_graph(Theta_cells, Goal_cells, limits, Obstacles, models, paths)
 # MILP
 Theta_cells = [(3, 3), (2, 2)]
 Goal_cells = [(3, 6), (4, 3)]
-optimize(Theta_cells, Goal_cells, limits, paths)
+ma_chosen_nodes = optimize(Theta_cells, Goal_cells, limits, paths)
+plot_path(limits, Obstacles, models, ma_chosen_nodes, paths)
+
