@@ -131,10 +131,6 @@ def optimize(Theta_cells, Goal_cells, limits, paths):
         model.addConstr(LinExpr([1] * len(theta_out_vars), theta_out_vars) == 1, name="A%s-StartOut")
         model.addConstr(LinExpr([1] * len(goal_in_vars), goal_in_vars) == 1, name="A%s-GoalIn")
         model.addConstr(LinExpr([1] * len(goal_out_vars), goal_out_vars) == 0, name="A%s-GoalOut")
-        print("theta out", len(theta_out))
-        for name in theta_out: print(name)
-        print("goal in ", len(goal_in))
-        for name in goal_in: print(name)
 
         # other edges has same numbers of incoming and outcoming edges
         for i in range(min_x, max_x, 1):
@@ -249,8 +245,20 @@ paths = compute_graph(limits, Obstacles, models)
 # Goal_cells = [(3, 5), (4, 3)]
 # plot_graph(Theta_cells, Goal_cells, limits, Obstacles, models, paths)
 # MILP
-Theta_cells = [(3, 3), (2, 2)]
-Goal_cells = [(3, 6), (4, 3)]
+# Theta_cells = [(3, 3), (2, 2)]
+# Goal_cells = [(3, 6), (4, 3)]
+Theta_cells = [(3, 13), (3, 15), (3, 17),
+               (5, 13), (5, 15), (5, 17),
+               (7, 13), (7, 15), (7, 17),
+               (3, 3), (3, 5), (3, 7),
+               (5, 3), (5, 5), (5, 7),
+               (7, 3), (7, 5), (7, 7)]
+Goal_cells = [(13, 3), (15, 3), (17, 3),
+               (13, 5), (15, 5), (17, 5),
+               (13, 7), (15, 7), (17, 7),
+               (13, 13), (15, 13), (17, 13),
+               (13, 15), (15, 15), (17, 15),
+               (13, 17), (15, 17), (17, 17)]
 ma_chosen_nodes = optimize(Theta_cells, Goal_cells, limits, paths)
 plot_path(limits, Obstacles, models, ma_chosen_nodes, paths)
 
