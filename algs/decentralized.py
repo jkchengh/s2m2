@@ -51,7 +51,7 @@ def decentralized_algo(models, thetas, goals, limits, obstacles,
 
 class Node:
     def __init__(self, num, plans = [], makespan = 0,
-                G = nx.DiGraph(), orders = set(),
+                G = DiGraph(), orders = set(),
                 collisions = {}):
         # params [num]
         self.num = num
