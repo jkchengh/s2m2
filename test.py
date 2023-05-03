@@ -22,7 +22,8 @@ def test(env, problem_path, config_path):
 
     trajs = ref2traj(refs)
     # plot_results(agents, limits, Obstacles, Thetas, Goals, trajs, name, refs=refs)
+    animate_results(agents, limits, Obstacles, Thetas, Goals, trajs, name)
 
     return refs
 
-test("zigzag", "problems/zigzag/problem.yaml", "problems/zigzag/config.yaml")
+test("ground", "problems/ground/problem.yaml", "problems/ground/config.yaml")

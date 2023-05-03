@@ -5,8 +5,6 @@ import mpl_toolkits.mplot3d as a3
 import matplotlib.pyplot as plt
 import pypoman as ppm
 from shapely.geometry.polygon import Polygon
-from models.auv import *
-from models.hovercraft import *
 from util import *
 
 def plot_env(map_limits, Obstacles):
@@ -71,14 +69,14 @@ def extract_paths(models, ma_thetas, ma_segs):
     agent_num = len(models)
     paths = []
     for idx in range(agent_num):
-        theta = ma_thetas[idx]
+        theta = ma_thetas[idx] # start
         segs = ma_segs[idx]
-
-        if len(theta) == 2:
+  
+        if len(theta) == 2: # position = (x,y)
             ref_x, ref_y, ref_theta, tru_x, tru_y, tru_theta, times =  [], [], [], [], [], [], []
             q0 = theta + [0]
             for seg in segs:
-                t, qref, uref = seg
+                t, qref, uref = seg # [time, qref, uref]
                 ref_x = ref_x + [qref[i][0] for i in range(len(qref))]
                 ref_y = ref_y + [qref[i][1] for i in range(len(qref))]
                 ref_theta = ref_theta + [qref[i][2] for i in range(len(qref))]
@@ -87,55 +85,10 @@ def extract_paths(models, ma_thetas, ma_segs):
                 run = models[idx].run_model
                 q = run(q0, t, qref, uref)
                 q0 = q[-1]
-                tru_x = tru_x + [q[i][0] for i in range(len(q)-1)]
+                tru_x = tru_x + [q[i][0] for i in range(len(q)-1)] # why needed ? 
                 tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
                 tru_theta = tru_theta + [q[i][2] for i in range(len(q)-1)]
             paths.append([ref_x, ref_y, ref_theta, tru_x, tru_y, tru_theta, times])
-
-        elif len(theta) == 3:
-
-            if isinstance(models[0], AUV):
-                q0 = theta + [0, 0, 0]
-                ref_x, ref_y, ref_z, times = [], [], [], []
-                tru_x, tru_y, tru_z, tru_thi, tru_theta, tru_psi = [], [], [], [], [], []
-                for seg in segs:
-                    t, qref, uref = seg
-                    ref_x = ref_x + [qref[i][0] for i in range(len(qref))]
-                    ref_y = ref_y + [qref[i][1] for i in range(len(qref))]
-                    ref_z = ref_z + [qref[i][2] for i in range(len(qref))]
-                    times = times + [t[i] for i in range(len(t))]
-
-                    run = models[idx].run_model
-                    q = run(q0, t, qref, uref)
-                    q0 = q[-1]
-                    tru_x = tru_x + [q[i][0] for i in range(len(q)-1)]
-                    tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
-                    tru_z = tru_z + [q[i][2] for i in range(len(q)-1)]
-                    tru_thi = tru_thi + [q[i][3] for i in range(len(q)-1)]
-                    tru_theta = tru_theta + [q[i][4] for i in range(len(q)-1)]
-                    tru_psi = tru_psi + [q[i][5] for i in range(len(q)-1)]
-
-                paths.append([ref_x, ref_y, ref_z,
-                              tru_x, tru_y, tru_z, tru_thi, tru_theta, tru_psi, times])
-
-            elif isinstance(models[0], Hovercraft):
-                q0 = theta + [0, 0, 0]
-                ref_x, ref_y, ref_z, tru_x, tru_y, tru_z, times = [], [], [], [], [], [], []
-
-                for seg in segs:
-                    t, qref, uref = seg
-                    ref_x = ref_x + [qref[i][0] for i in range(len(qref))]
-                    ref_y = ref_y + [qref[i][1] for i in range(len(qref))]
-                    ref_z = ref_z + [qref[i][2] for i in range(len(qref))]
-                    times = times + [t[i] for i in range(len(t))]
-
-                    run = models[idx].run_model
-                    q = run(q0, t, qref, uref)
-                    q0 = q[-1]
-                    tru_x = tru_x + [q[i][0] for i in range(len(q)-1)]
-                    tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
-                    tru_z = tru_z + [q[i][2] for i in range(len(q)-1)]
-                paths.append([ref_x, ref_y, ref_z, tru_x, tru_y, tru_z, times])
 
     return paths
 
