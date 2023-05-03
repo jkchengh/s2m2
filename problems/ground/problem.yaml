@@ -1,7 +1,7 @@
 agents:
--   k: [0.5, 0.5, 0.5]
+-   k: [0.5, 0.5]
     size: 1
-    type: unicycle
+    type: single_integrator
     velocity: 1
 -   k: [0.5, 0.5, 0.5]
     size: 1

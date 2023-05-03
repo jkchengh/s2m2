@@ -1,6 +1,7 @@
 import yaml
 from models.agent import *
 from models.unicycle import *
+from models.single_integrator import *
 import numpy as np
 def write_results(file_name, paths, problem_path = None):
 
@@ -45,6 +46,13 @@ def read_problem(file_name):
 
     return [name, limits, Obstacles, agents, Thetas, Goals]
 
+def get_agent_types(file_name):
+    with open(file_name, "r") as file:
+        data = yaml.load(file, Loader=yaml.Loader)
+        agent_types = [agent["type"] for agent in data["agents"]]
+    return agent_types
+
+
 def write_problem(file_name, name, limits, Obstacles, agents, Thetas, Goals):
     data = dict()
     data['name'] = name
@@ -62,8 +70,11 @@ def write_agent(agent):
     agent_dict["k"] = agent.k
     agent_dict["velocity"] = agent.velocity
     agent_dict["size"] = agent.size
-    if isinstance(agent, Unicycle):
+    if isinstance(agent, SingleIntegrator):
+        agent_dict["type"] = "single_integrator"
+    elif isinstance(agent, Unicycle):
         agent_dict["type"] = "unicycle"
+
 
     return agent_dict
 
@@ -72,9 +83,11 @@ def read_agent(agent):
     k = agent["k"]
     velocity = agent["velocity"]
     size = agent["size"]
-    if agent["type"] == "unicycle":
+    if agent["type"] == "single_integrator":
+        return SingleIntegrator(size, velocity, k)
+    elif agent["type"] == "unicycle":
         return Unicycle(size, velocity, k)
-
+    
 def write_polytope(poly):
     A, b = poly
     lines = []

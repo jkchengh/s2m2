@@ -5,8 +5,7 @@ import mpl_toolkits.mplot3d as a3
 import matplotlib.pyplot as plt
 import pypoman as ppm
 from shapely.geometry.polygon import Polygon
-from util import *
-
+from util import *    
 def plot_env(map_limits, Obstacles):
     fig = plt.figure()
     if len(map_limits) == 2:
@@ -64,17 +63,18 @@ def plot_thetas(thetas):
         x, y = poly.exterior.xy
         plt.fill(x, y, facecolor='blue', alpha=0.3)
 
-def extract_paths(models, ma_thetas, ma_segs):
+def extract_paths(models, agent_types, ma_thetas, ma_segs):
     # viz initial states and trajectories
     agent_num = len(models)
     paths = []
     for idx in range(agent_num):
+        agent_type = agent_types[idx]
         theta = ma_thetas[idx] # start
         segs = ma_segs[idx]
   
-        if len(theta) == 2: # position = (x,y)
+        if agent_type == 'unicycle':
             ref_x, ref_y, ref_theta, tru_x, tru_y, tru_theta, times =  [], [], [], [], [], [], []
-            q0 = theta + [0]
+            q0 = theta + [0] # [x,y,0]
             for seg in segs:
                 t, qref, uref = seg # [time, qref, uref]
                 ref_x = ref_x + [qref[i][0] for i in range(len(qref))]
@@ -89,7 +89,21 @@ def extract_paths(models, ma_thetas, ma_segs):
                 tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
                 tru_theta = tru_theta + [q[i][2] for i in range(len(q)-1)]
             paths.append([ref_x, ref_y, ref_theta, tru_x, tru_y, tru_theta, times])
+        else:
+            ref_x, ref_y, tru_x, tru_y, times =  [], [], [], [], []
+            q0 = theta 
+            for seg in segs:
+                t, qref, uref = seg # [time, qref, uref]
+                ref_x = ref_x + [qref[i][0] for i in range(len(qref))]
+                ref_y = ref_y + [qref[i][1] for i in range(len(qref))]
+                times = times + [t[i] for i in range(len(t))]
 
+                run = models[idx].run_model
+                q = run(q0, t, qref, uref)
+                q0 = q[-1]
+                tru_x = tru_x + [q[i][0] for i in range(len(q)-1)]
+                tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
+            paths.append([ref_x, ref_y, tru_x, tru_y, times])
     return paths
 
 class Faces():
