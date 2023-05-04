@@ -35,22 +35,13 @@ def get_uref(agent_type, p1, p2, times):
 			wref = 0
 			uref.append([vref, wref])
 	else: # for single integrator, needs to be checked
-		# x_dist = p2[0] - p1[0]
-		# y_dist = p2[1] - p1[1]
-		# vx_ref = x_dist / (times[-1] - times[0])
-		# vy_ref = y_dist / (times[-1] - times[0])
-		# for _ in times:
-		# 	vxref = vx_ref
-		# 	vyref = vy_ref
-		# 	uref.append([vxref, vyref])
 		dist = norm(np.array(p2) - np.array(p1))
 		v_ref = dist / (times[-1] - times[0]) # constant velocity
-		dim = len(p1)
 		uref = []
 		for _ in times:
-			vref = v_ref
-			wref = 0
-			uref.append([vref, wref])
+			vxref = v_ref
+			vyref = vxref
+			uref.append([vxref, vyref])
 	return uref
 
 def ref2traj(agent_types,ma_nodes):

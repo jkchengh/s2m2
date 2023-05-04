@@ -83,6 +83,6 @@ def animate_results(models, agent_types, limits, obstacles, Thetas, goals, ma_se
     ani = animation.FuncAnimation(fig, animate, frames = total_frames, init_func=init,
                                     blit=True, interval = interval)
 
-    path = os.path.abspath("results/%s.mp4" % (name))
+    # path = os.path.abspath("results/%s.mp4" % (name))
     # ani.save(path, writer='ffmpeg')
     plt.show()

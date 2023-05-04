@@ -85,7 +85,7 @@ def extract_paths(models, agent_types, ma_thetas, ma_segs):
                 run = models[idx].run_model
                 q = run(q0, t, qref, uref)
                 q0 = q[-1]
-                tru_x = tru_x + [q[i][0] for i in range(len(q)-1)] # why needed ? 
+                tru_x = tru_x + [q[i][0] for i in range(len(q)-1)] 
                 tru_y = tru_y + [q[i][1] for i in range(len(q)-1)]
                 tru_theta = tru_theta + [q[i][2] for i in range(len(q)-1)]
             paths.append([ref_x, ref_y, ref_theta, tru_x, tru_y, tru_theta, times])
